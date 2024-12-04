@@ -1,0 +1,7 @@
+{
+  "type": "module",
+  "dependencies": {
+    "express": "^4.21.1",
+    "puppeteer": "^23.10.0"
+  }
+}

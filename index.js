@@ -1,15 +1,21 @@
 import express from 'express';
 import puppeteer from 'puppeteer';
+import os from 'os';
 
 const app = express();
+app.set('trust proxy', true);
 const port = 3500;
+
+// Get current OS platform
+const platform = os.platform();
+console.log(`Running on ${platform} platform`);
 
 // Helper function to clean text
 function cleanText(text) {
   return text
-    .replace(/\s+/g, ' ')           // Replace multiple spaces with single space
-    .replace(/\n+/g, ' ')           // Replace newlines with space
-    .trim();                        // Remove leading/trailing whitespace
+    .replace(/\s+/g, ' ')           
+    .replace(/\n+/g, ' ')           
+    .trim();                        
 }
 
 // Main scraping endpoint
@@ -30,17 +36,24 @@ app.get('/scrape', async (req, res) => {
       return res.status(400).json({ error: 'Invalid URL format' });
     }
 
-    // Launch browser
-    browser = await puppeteer.launch({
+    // Configure browser launch options based on platform
+    const launchOptions = {
       headless: 'new',
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
         '--disable-dev-shm-usage',
         '--disable-gpu'
-      ],
-      executablePath: '/usr/bin/google-chrome'
-    });
+      ]
+    };
+
+    // Add executablePath for Linux
+    if (platform === 'linux') {
+      launchOptions.executablePath = '/usr/bin/google-chrome';
+    }
+
+    // Launch browser with platform-specific options
+    browser = await puppeteer.launch(launchOptions);
     
     const page = await browser.newPage();
     

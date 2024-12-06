@@ -2,8 +2,18 @@ version: '3.8'
 services:
   scraper:
     build: .
-    ports:
-      - "3500:3500"
+    expose:
+      - "3500"
     environment:
       - NODE_ENV=production
-    restart: unless-stopped 
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - scraper
+    restart: unless-stopped
